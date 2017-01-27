@@ -1,0 +1,79 @@
+?php
+ +
+ +/**
+ + * Created by PhpStorm.
+ + * User: lahiru
+ + * Date: 2/22/16
+ + * Time: 11:53 AM
+ + */
+ +class Queue
+ +{
+ +    protected $queue;
+ +    protected $limit;
+ +
+ +    public function __construct($limit = 1024) {
+ +        // initialize the stack
+ +        $this->queue = array();
+ +        // stack can only contain this many items
+ +        $this->limit = $limit;
+ +    }
+ +
+ +    public function enqueue($item) {
+ +        // trap for stack overflow
+ +        if (count($this->queue) < $this->limit) {
+ +            // prepend item to the start of the array
+ +            array_push($this->queue, $item);
+ +        } else {
+ +            throw new RunTimeException('Queue is full!');
+ +        }
+ +    }
+ +
+ +    public function dequeue() {
+ +        if ($this->isEmpty()) {
+ +            // trap for stack underflow
+ +            throw new RunTimeException('Queue is empty!');
+ +        } else {
+ +            // pop item from the start of the array
+ +            return array_shift($this->queue);
+ +        }
+ +    }
+ +
+ +
+ +    public function isEmpty() {
+ +        return empty($this->queue);
+ +    }
+ +} 
+View
+48  Stack.php
+@@ -0,0 +1,48 @@
+ +<?php
+ +
+ +/**
+ + * Created by PhpStorm.
+ + * User: lahiru
+ + * Date: 2/22/16
+ + * Time: 11:49 AM
+ + */
+ +class Stack
+ +{
+ +    protected $stack;
+ +    protected $limit;
+ +
+ +    public function __construct($limit = 1024) {
+ +        // initialize the stack
+ +        $this->stack = array();
+ +        // stack can only contain this many items
+ +        $this->limit = $limit;
+ +    }
+ +
+ +    public function push($item) {
+ +        // trap for stack overflow
+ +        if (count($this->stack) < $this->limit) {
+ +            // prepend item to the start of the array
+ +            array_unshift($this->stack, $item);
+ +        } else {
+ +            throw new RunTimeException('Stack is full!');
+ +        }
+ +    }
+ +
+ +    public function pop() {
