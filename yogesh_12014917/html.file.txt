@@ -1,0 +1,21 @@
+<html>
+<h1> web interface </h1>
+<p id = "demo"></p>
+<body>
+<a href = "home" alert> Home</a>
+<a href="Refrence"alert>Reference </a>
+<a href="Welcome"alert>welcome </a>
+<a href="Content"alert>Content </a>
+<h1>Home</h1>
+<p >  </p>
+<h1>Reference</h1>
+<p>  </p>
+<h1>Welcome</h1>
+<p>  </p>
+<h1>content<h1>
+<p>  </p>
+
+<script type="text/javascript" src="file.js"></script>
+<script src="js/YourExternalJQueryScripts.js"></script>
+</body>
+
