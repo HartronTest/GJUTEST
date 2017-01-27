@@ -1,0 +1,29 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <title>GeoServer Workshop</title>
+
+        <script src="http://www.webtoolkit.info/djs/webtoolkit.base64.js"></script>
+        <script src="rest-example.js"></script>
+
+        <script language="Javascript">
+           var geoserverUsername='admin';
+           var geoserverPassword='***********';
+        </script>
+  </head>
+
+  <body onload="init()">
+        <h1 id="title">GeoServer Workshop - REST API trough JavaScript</h1>
+
+        <h2>Available Styles</h2>
+           <select id="sldSelect" onchange="updateSelectedSld(this)"></select>
+
+        <h2>Available Layers: 'geosolutions' workspace</h2>
+           <select id="lyrSelect" onchange="updateSelectedLyr(this)"></select>
+
+        <br/><br/>
+        SLD: <input type="text" id="selectedSld" style="witdh: 300px" readonly> -
+        Layer: <input type="text" id="selectedLyr" style="witdh: 300px" readonly>
+        <button id="assignSld" onclick="assignSldToLyr()">Assign SLD ----> Layer</button>
+  </body>
+
+</html>
