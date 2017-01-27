@@ -1,0 +1,21 @@
+<html>
+<body>
+<title>Stack Implementation</title>
+<p>Click the button to remove the element from the stack.</p>
+
+<button onclick="myFunction()">Remove</button>
+
+<p id="demo"></p>
+
+<script>
+var friends = ["Muskan", "veenu", "jaismine", "manisha"];
+document.getElementById("demo").innerHTML = friends;
+
+function myFunction() {
+    friends.pop();
+    document.getElementById("demo").innerHTML = friends;
+}
+</script>
+
+</body>
+</html>
