@@ -1,0 +1,171 @@
+Build the web app with AngularJS
+
+We’ll use AngularJS to tie everything together. AngularJS will help us to route user requests, render different views, and send data to and from the database.
+
+Our AngularJS code resides in the /public/js folder in the app.js file. To simplify things, we’ll focus solely on the code that is required to retrieve and display contacts when the default homepage route (“/”) is requested. Implementing this functionality requires that we:
+
+    render the appropriate view and template using the AngularJS routeProvider (index.html and list.html).
+    fetch the contacts from the database using an AngularJS service (GET /contacts).
+    pass the data from the service to the view with an AngularJS controller (ListController).
+
+The code looks like the following:
+
+angular.module("contactsApp", ['ngRoute'])
+  .config(function($routeProvider) {
+    $routeProvider
+      .when("/", {
+        templateUrl: "list.html",
+        controller: "ListController",
+        resolve: {
+          contacts: function(Contacts) {
+              return Contacts.getContacts();
+          }
+        }
+      })
+  })
+  .service("Contacts", function($http) {
+    this.getContacts = function() {
+      return $http.get("/contacts").
+        then(function(response) {
+            return response;
+        }, function(response) {
+            alert("Error retrieving contacts.");
+        });
+    }
+  })
+  .controller("ListController", function(contacts, $scope) {
+    $scope.contacts = contacts.data;
+  });
+
+
+
+
+
+
+
+
+
+The Controller Layer
+
+The controller layer is made of Angular controllers that glue the data retrieved from the backend and the view together. The controller initializes the view model and defines how the view should react to model changes and vice-versa:
+
+  
+angular.module('loginApp', ['common',  'editableTableWidgets'])  
+    .controller('LoginCtrl', function ($scope, LoginService) {
+
+        $scope.onLogin = function () {
+            console.log('Attempting login with username ' + $scope.vm.username + ' and password ' + $scope.vm.password);
+
+            if ($scope.form.$invalid) {
+                return;
+            }
+
+            LoginService.login($scope.vm.userName, $scope.vm.password);
+
+        };
+
+    });
+
+One of the main responsibilities of the controller is to perform frontend validations. Any validations done on the frontend are for user convenience only - for example they are useful to immediately inform the user that a field is required.
+
+Any frontend validations need to be repeated in the backend at the service layer level due to security reasons, as the frontend validations can be easily bypassed.
+
+
+
+
+
+
+
+
+
+
+
+
+
+The Frontend Services Layer
+
+A set of Angular services that allow to interact with the backend and that can be injected into Angular controllers:
+
+  
+angular.module('frontendServices', [])  
+    .service('UserService', ['$http','$q', function($http, $q) {
+        return {
+            getUserInfo: function() {
+                var deferred = $q.defer();
+
+                $http.get('/user')
+                    .then(function (response) {
+                        if (response.status == 200) {
+                            deferred.resolve(response.data);
+                        }
+                        else {
+                            deferred.reject('Error retrieving user info');
+                        }
+                });
+
+                return deferred.promise;
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The Router Layer
+
+The same Spring MVC annotations used to build a JSP/Thymeleaf application can also be used to build a REST API.
+
+The big difference is that the controller methods do not return a String that defines which view template should be rendered. Instead the
+@ResponseBody annotation indicates that the return value of the controller method should be directly rendered and become the response body:
+
+  
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.GET)
+    public UserInfoDTO getUserInfo(Principal principal) {
+        User user = userService.findUserByUsername(principal.getName());
+        Long todaysCalories = userService.findTodaysCaloriesForUser(principal.getName());
+
+        return user != null ? new UserInfoDTO(user.getUsername(), user.getMaxCaloriesPerDay(), todaysCalories) : null;
+    }
+
+If all the methods of the class are to be annotated with @ResponseBody, then it's better to annotate the whole class with @RestController instead.
+
+By adding the Jackson JSON library, the method return value will be directly converted to JSON without any further configuration. Its also possible to convert to XML or other formats, depending on the value of the Accept HTTP header specified by the client.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

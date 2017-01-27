@@ -1,0 +1,91 @@
+
+    persist them as an array and transform it into a set in JavaScript
+
+or
+
+    persist them as an object in the form of {entry1: true, entry2: true, ...}
+
+
+
+Database.Persist.MongoDB
+
+Synopsis
+Documentation
+
+withMongoDBConn :: (MonadIO m, Applicative m) => Database -> HostName -> (ConnectionPool -> m b) -> m b
+Source
+
+withMongoDBPool :: (MonadIO m, Applicative m) => Database -> HostName -> Int -> (ConnectionPool -> m b) -> m b
+Source
+
+runMongoDBConn :: MonadIO m => AccessMode -> Action m b -> ConnectionPool -> m b
+Source
+
+type HostName = String
+
+Either a host name e.g., "haskell.org" or a numeric host address string consisting of a dotted decimal IPv4 address or an IPv6 address e.g., "192.168.0.1".
+
+u :: String -> UString
+
+data Action m a
+
+A monad on top of m (which must be a MonadIO) that may access the database and may fail with a DB Failure
+
+Instances
+MonadTrans Action	 
+(Applicative m, Functor m, MonadControlIO m) => PersistBackend Action m	 
+Monad m => MonadError Failure (Action m)	 
+Monad m => Monad (Action m)	 
+Functor m => Functor (Action m)	 
+(Monad m, Functor m) => Applicative (Action m)	 
+MonadIO m => MonadIO (Action m)	 
+MonadControlIO m => MonadControlIO (Action m)	 
+(MonadControlIO m, Applicative m, Functor m) => MonadDB (Action m)	 
+SinglePiece (Key Action entity)	 
+
+data AccessMode
+
+Type of reads and writes to perform
+
+Constructors
+ReadStaleOk	
+
+Read-only action, reading stale data from a slave is OK.
+UnconfirmedWrites	
+
+Read-write action, slave not OK, every write is fire & forget.
+ConfirmWrites GetLastError	
+
+Read-write action, slave not OK, every write is confirmed with getLastError.
+
+master :: AccessMode
+
+Same as ConfirmWrites []
+
+slaveOk :: AccessMode
+
+Same as ReadStaleOk
+
+(=:) :: Val v => Label -> v -> Field
+
+Field with given label and typed value
+
+type ConnectionPool = (Pool IOError Pipe, Database)
+Source
+
+module Database.Persist
+
+data MongoConf
+Source
+
+Information required to connect to a mongo database
+
+Constructors
+MongoConf	 
+
+mgDatabase :: String
+mgHost :: String
+mgPoolSize :: Int
+
+Instances
+PersistConfig MongoConf	 

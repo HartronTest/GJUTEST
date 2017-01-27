@@ -1,0 +1,56 @@
+ C program to implement stack. Stack is a LIFO data structure.
+ * Stack operations: PUSH(insert operation), POP(Delete operation)
+ * and Display stack.
+ */
+#include <stdio.h>
+#define MAXSIZE 5
+ 
+struct stack
+{
+    int stk[MAXSIZE];
+    int top;
+};
+typedef struct stack STACK;
+STACK s;
+ 
+void push(void);
+int  pop(void);
+void display(void);
+ 
+void main ()
+{
+    int choice;
+    int option = 1;
+    s.top = -1;
+ 
+    printf ("STACK OPERATION\n");
+    while (option)
+    {
+        printf ("------------------------------------------\n");
+        printf ("      1    -->    PUSH               \n");
+        printf ("      2    -->    POP               \n");
+        printf ("      3    -->    DISPLAY               \n");
+        printf ("      4    -->    EXIT           \n");
+        printf ("------------------------------------------\n");
+ 
+        printf ("Enter your choice\n");
+        scanf    ("%d", &choice);
+        switch (choice)
+        {
+        case 1:
+            push();
+            break;
+        case 2:
+            pop();
+            break;
+        case 3:
+            display();
+            break;
+        case 4:
+            return;
+        }
+        fflush (stdin);
+        printf ("Do you want to continue(Type 0 or 1)?\n");
+        scanf    ("%d", &option);
+    }
+}

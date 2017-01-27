@@ -1,0 +1,166 @@
+
+
+Add a custom git command which:
+
+    Temporarily does the commit
+    Pushes it to the remote server
+    Runs the tests (using a CI server, post-receive hook, or ssh)
+    Reverts the commit if the tests fail
+
+Create an executable called git-test-n-commit and place it in your path:
+
+#!/bin/bash
+echo "Committing results..."
+git commit "$@"
+echo "Pushing to remote testing server..."
+git push remote-server-git-url remote-branch -f
+echo "Running tests"
+ssh remote-server 'cd my_repo; run-my-tests' || 
+   (echo "Tests failed, undoing commit" && git reset HEAD^)
+
+Then instead of calling git commit ARGS, the developers can call git test-n-commit ARGS. If the tests pass the code will remain committed. If the tests fail it will be as if it was never committed.
+
+
+
+
+
+
+
+
+ 3
+down vote
+accepted
+	
+
+In general it does not really matter what you do before you push. It does not really matter to anyone else what your personal workflow is as long as you push according to the standards of your team.
+
+In the case you described I would use git stash. In detail:
+
+    commit b.txt
+    stash other changes
+    test
+    push
+    pop stash
+
+
+
+
+
+
+
+
+
+
+
+
+
+As a database I’ve chosen MongoDB, because it fits our needs well and it’s really simple to set up! We could also use any other database be it relational or another style of NoSQL DB, not trying to start any discussions on BASE vs ACID or the like.
+
+If you’re not familiar with MongoDB, it’s a document-oriented database, that saves JSON-like (BSON - Binary JSON) documents. You can try it out real quick in the Mongo shell, which is also a full-on Javascript interpreter. If you want to go into detail I can also recommend this book.
+
+We’ll start out by adding Casbah to our sbt dependencies. Casbah is a small toolkit for working with Mongo in Scala. Now we can start using Mongo by connecting inside our ScalatraBootstrap.
+
+import com.ltj.server._
+import org.scalatra._
+import javax.servlet.ServletContext
+import com.mongodb.casbah.Imports._
+
+class ScalatraBootstrap extends LifeCycle {
+  override def init(context: ServletContext) {
+    val mongoClient =  MongoClient()
+    val mongo = mongoClient("pizza")
+    context.mount(new PizzaServlet(mongo), "/*")
+  }
+}
+
+With casbah we can create a client with default settings (port 27017 and localhost). We can then connent to a database by calling the client.
+
+In our case we’ll connect to the database “pizza”. Then we insert the database into the constructor of our servlet. In our servlet we’ll use this instance to persist our orders, query them and delete them. These 3 cases map very well to the HTTP methods and we’ll keep using only JSON to transfer our data.
+
+class PizzaServlet(db: MongoDB) extends PizzaorderStack {
+
+  post("/orders"){
+    val json = request.body
+    val order = read[Order](json)
+    if (!order.isValidOrder()) halt(400)
+
+    val orders = db("orders")
+    orders += JSON.parse(json).asInstanceOf[DBObject]
+
+  }
+
+  get("/orders"){
+    val orders = db("orders").find()
+    JSON.serialize(orders.toList)
+  }
+
+  delete("/orders/:id"){
+    val id = new ObjectId(params("id"))
+    val orders = db("orders")
+    orders.remove(MongoDBObject("_id" ->  id))
+  }
+
+}
+
+As we can see, working with Mongo and JSON is pretty simple. We’re just pushing our JSON data straight to the database without normalization. Now I did a small test with our current client to see if the POST-Request to orders saves the order and voila! It works!
+
+clientTest
+
+The “find”-method returns a cursor which we can easily convert to a List or another Scala collection and then just serialize it to JSON.
+
+Deleting is a little bit more tricky. Mongo has it’s own mechanic of keeping a unique id for each entry of the collection called the “ObjectId”.
+
+If you’ve expiremented with the Mongo shell or worked with Mongo before you’ll familiar with it, but basically it’s a 12-byte BSON Object which Mongo will add to your document if you don’t specify your own unique identifier. It’s pretty clever and you can check out some of the details here.
+
+So once we’ve converted our id-string to an ObjectId we can then easily remove the specified document. Now we can start expanding our client. We’ll start by making another HTML template where we want to list all of our orders.
+
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Orders</title>
+</head>
+<body onload="com.ltj.pizza.Main().showOrders()">
+	<h1>All Orders:</h1>
+	<ul id="orders">
+	
+	</ul>
+	<script src="lib/jquery-1.9.1.min.js"></script>
+	<script src="js/scala-2.11/pizza-order-fastopt.js"></script>
+</body>
+</html>
+
+Pretty simple so far, now let’s create some code, that retrieves all the orders via GET-Request and then appends it into our “orders” list.
+
+@JSExport
+def showOrders(): Unit = {
+  jQuery.get(url = "/orders",  success = (data: String) => {
+    val orders = read[Seq[Order]](data)
+    orders.foreach(order => {
+	  val list = jQuery("<ul>")
+	  order.pizzas.foreach { pizza => list.append(jQuery("<li>").text(pizza.toString())) }
+	  jQuery("#orders").append(jQuery("<li>").append(list))
+    })
+  })
+}
+  
+
+
+
+
+
+
+
+This is my script on Pre-Receive Hook.
+
+while read from_ref to_ref ref_name; do
+    echo "Ref update:"
+        echo " Old value: $from_ref"
+        echo " New value: $to_ref"
+        echo " Ref name:  $ref_name"
+        echo " Diff:"
+        git clone --progress -v $GIT_URL $CLONE_DIR1
+        cd $CLONE_DIR1
+        git checkout -b test remotes/origin/Feature1
+        git merge --no-commit -m "Merging feature with local on-push code" $ref_name
+        (....)
+done
