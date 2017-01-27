@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>test your webservice</title>
+</head>
+<body>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
+<article ng-app="booksInventoryApp">
+  <section ng-controller="booksCtrl">
+  </section>
+</article>
+<script type="text/javascript">
+    var app = angular.module('booksInventoryApp', []);
+
+app.controller('booksCtrl', function($scope, $http) {
+
+
+
+                        //ResponseInvocationAgentRequestDTO 
+                        var jsonObject = {
+                                      "id":65,
+                                      "idUserSender": 5}
+
+
+                                    console.log("aaaaaaaaaaaaaaaaaaaa");
+            $http({
+                method: 'put',             
+                url: 'yout URI' ,
+                data: jsonObject 
+            })
+            .success(function(data,status){
+                console.log('all is good', data);
+
+                })
+                .error(function(data,status){
+                    console.log('Erreur into url '+data);
+                });
+
+
+});
+
+</script>
+</body>
+</html>
