@@ -1,0 +1,27 @@
+<?php 
+// Queue implementation 
+ 
+class Queue 
+{ 
+    protected $queue = array(), $limit; 
+    public function __construct($limit = 100) 
+    { 
+        $this->limit = $limit; 
+    } 
+     
+    public function enqueue($item) 
+    { 
+        return count($this->queue) >= $this->limit ? exit('Queue is full.') : $this->queue[] = $item; 
+    } 
+    
+    public function dequeue() 
+    { 
+        return empty($this->queue) ? exit('Queue is empty.') : array_shift($this->queue); 
+    } 
+   
+    public function bottom() 
+    { 
+        return current($this->queue); 
+    } 
+} 
+?> 
