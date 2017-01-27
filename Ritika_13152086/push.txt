@@ -1,0 +1,17 @@
+	
+Add a custom git command which:
+
+Temporarily does the commit
+Pushes it to the remote server
+Runs the tests (using a CI server, post-receive hook, or ssh)
+Reverts the commit if the tests fail
+Create an executable called git-test-n-commit and place it in your path:
+
+#!/bin/bash
+echo "Committing results..."
+git commit "$@"
+echo "Pushing to remote testing server..."
+git push remote-server-git-url remote-branch -f
+echo "Running tests"
+ssh remote-server 'cd my_repo; run-my-tests' || 
+   (echo "Tests failed, undoing commit" && git reset HEAD^)
